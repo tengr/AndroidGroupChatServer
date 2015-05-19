@@ -1,54 +1,42 @@
-# Approximate Subgraph Matching - Relation Extraction
+# SydneyTweets
 
-Code for performing Relation Extraction using the Approximate Subgraph Matching algorithm
-Based originally on the NICTA VRL submission to BioNLPST-13.
+The following User Guide is based on Utuntu Operating System. 
 
-## Building
+# Installing Ansible
 
-Use Maven:
+To install ansible run these commands:
+	
+	$ sudo apt-get install software-properties-common
+	$ sudo apt-add-repository ppa:ansible/ansible
+	$ sudo apt-get update
+	$ sudo apt-get install ansible
 
-	$ mvn compile
-  
-For this to work you'll need appropriate dependencies installed in some Maven repository you can read:
+# Playbooks
+There are 3 playbooks used for deployment. These playbooks are used for creating a new instance on openstack and installing all the required packages and dependencies for streaming and analysing Tweets.
 
-* [ClearNLP with text span tracking](https://code.google.com/r/admackin-clearnlp-spans/)
-* JSBD adapted to use Maven (readbiomed jsbd project)
-* ESM version 1.1 (not 1.0 -- readbiomed esm project)
+## Plays:
+* `nova.yml` using module nova_compute to create a new instance on openstack(the parameters nodename and flavorid need to be provided).
+* `mount.yml` format the volume to be attached to the instance to ext4 and mount under `/mnt/data`, then create directory couchdb
+* `apps.yml` install packages and dependencies on instance for streaming, analysing and storing tweets.
 
+To run these plays more conveniently, we provide the script `install_instance.sh`.
 
-## Running Experiments
+## Basic Procedures
 
-Create a new directory, and set the environment variables:
+1.	Add key-pairs to Nectar through Dashboard.
+2.	modify the 'nova.yml' file，and replace `login_username`, `login_password`, `login_tenant_name`, `key_name` (You can find those information in the `OpenStack RC File` downloaded from nectar).
+3.	Run the `ansible_playbook/install_instance.sh` script, there will be 3个option on your screen.
+4.	Enter `1` to create instance，enter node name and flavor id based on the suggesions given.
+5.	If you want to create more than one instance，please repeat step 1，2.
+6.	Find the recently built instance in the Nectar Dashboard and log their IP addresses and add them to the file `/etc/ansible/hosts`, every node would have a unique name and its coorsponding Address.
+7.	Create a new volume from the Nectar Dashboard, and attach it to the relative instance.
+8.	Repeat step 3
+9.	Enter`2` to mount, enter host name following the suggestions (define hosts in `/etc/ansible/hosts`).
+10.	Repeat step 3
+11.	Enter `3` to install required software packagesenter host name following the suggestions (define hosts in `/etc/ansible/hosts`).
 
-* `TRAINING`: points to the directory containing unparsed `.txt` and `.a1`/`.a2` files
-* `TEST`: the same, for the test directory
-* `CONFIG`: points to the ClearNLP config - you probably just want to use 
-  `/PATH/TO/asm-re/src/main/resources/configure/config_en_dep-craft-fromraw.xml`
+# test run
 
-It's convenient to set up a file `config_vars` in the experiment directory to
-set these, and then source that from your helper scripts using '.'
-
-To parse,you'll need to download [the relevant ClearNLP models](https://code.google.com/p/clearnlp/wiki/TrainedModelsOld), which should be stored at `/PATH/TO/asm-re/model`. The above config file assumes you have:
-
-* `dictionary-1.2.0.zip`
-* `craft-en-pos-1.1.0g.jar`
-* `craft-en-dep-1.1.0b1.jar`
-
-You can then run `asm-re/src/main/scripts/parse-and-move.sh`
-To learn rule patterns, call `asm-re/src/main/scripts/infer-rules.sh`
-
-So assuming you have `../shared-scripts` symlinked to
-`/PATH/TO/asm-re/src/main/scripts`, 
-in the experiment directory, you might have a file `parse.sh`:
-
-	#!/bin/sh
-	. config_vars
-	../shared-scripts/parse-and-move.sh
-
-And `infer-rules.sh`:
-
-	#!/bin/sh
-	. config_vars
-	../shared-scripts/run-rule-inference.sh
-
-After running `./infer-rules.sh`, the rules should end up in `./training/inferred-rules`
+	
+1.	For streaming, try 'setsid python tweepy_streaming_api_Node#.py', # is the node number, e.g. 1,2,3,4
+2.	For analysing, try 'setsid python results.py #', # is the node number, e.g. 1,2,3,4
