@@ -23,8 +23,8 @@ To run these plays more conveniently, we provide the script `install_instance.sh
 
 ## Basic Procedures
 
-1.	Add key-pairs to Nectar through Dashboard.
-2.	Modify the 'nova.yml' file，and replace `login_username`, `login_password`, `login_tenant_name`, `key_name` (You can find those information in the `OpenStack RC File` downloaded from Nectar).
+1.	Add key-pairs to Nectar through Dashboard and store the private key at `~/ansible_playbook/nectar.key`.
+2.	Modify the `nova.yml` file, and replace `login_username`, `login_password`, `login_tenant_name`, `key_name` (You can find those information in the `OpenStack RC File` downloaded from Nectar).
 3.	Run the `ansible_playbook/install_instance.sh` script, there will be 3 options on your screen.
 4.	Enter `1` to create instance，enter node name and flavor id based on the suggesions given.
 5.	If you want to create more than one instance，please repeat step 1 and 2.
@@ -40,6 +40,7 @@ To run these plays more conveniently, we provide the script `install_instance.sh
 # test run
 
 	
-1.	For streaming, try `setsid python tweepy_streaming_api_Node#.py`, # is the node number, e.g. 1,2,3,4
-2.	For analysing, try `setsid python results.py #`, # is the node number, e.g. 1,2,3,4
-3.	For checking database, try `source check_db#.sh`, # is the node number, e.g. 1,2,3,4
+1.	Modify the `twitter_authentication.py` file, and replace `CONSUMER_KEY`, `CONSUMER_SECRET`, `ACCESS_TOKEN`, `ACCESS_TOKEN_SECRET`.
+2.	For streaming, try `setsid python tweepy_streaming_api_Node#.py`, # is the node number, e.g. 1,2,3,4
+3.	For analysing, try `setsid python results.py #`, # is the node number, e.g. 1,2,3,4
+4.	For checking database, try `source check_db#.sh`, # is the node number, e.g. 1,2,3,4
